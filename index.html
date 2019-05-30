@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hammurabi Javascript Port</title>
+</head>
+<body>
+<canvas id="gameboard" width="500" height="500">
+
+
+</canvas>
+
+<script type="text/javascript">
+
+    var helper = {};
+
+    helper.getSuffix = (number) => {
+
+        if (number === 1) return "1st";
+        else return number + "nd";
+    };
+
+
+    helper.defineShape = (shape, ctx) => {
+        var points = shape.points;
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (var i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+    };
+
+    helper.drawShape = (shape, ctx) => {
+        helper.defineShape(shape, ctx);
+        ctx.fill();
+        ctx.stroke();
+    };
+
+
+    function handleMouseDown(e) {
+        e.preventDefault();
+
+        var $canvas = document.getElementById('gameboard');
+        var ctx =  $canvas.getContext('2d');
+
+        var offsetX = $canvas.offsetLeft;
+        var offsetY = $canvas.offsetTop;
+
+        // get the mouse position
+        var mouseX = parseInt(e.clientX - offsetX);
+        var mouseY = parseInt(e.clientY - offsetY);
+
+        // console.log(offsetX, offsetY, mouseX, mouseY);
+
+        // iterate each shape in the shapes array
+        for (var i = 0; i < shapes.length; i++) {
+            var shape = shapes[i];
+            // define the current shape
+            helper.defineShape(shape, ctx);
+            // test if the mouse is in the current shape
+            if (ctx.isPointInPath(mouseX, mouseY)) {
+                // if inside, display the shape's message
+                alert(shape.message);
+            }
+        }
+
+    }
+
+
+    var gameboard = document.getElementById('gameboard').onmousedown = function (e) {
+        handleMouseDown(e);
+    };
+
+    var triangle = {
+        points: [{x: 25, y: 100}, {x: 50, y: 50}, {x: 75, y: 100}],
+        message: "I am a triangle"
+    };
+
+    var parallelogram = {
+        points: [{x: 150, y: 50}, {x: 250, y: 50}, {x: 200, y: 100}, {x: 100, y: 100}],
+        message: "I am a parallelogram"
+    };
+
+    // save the triangle and parallelogram in a shapes[] array
+
+    var shapes = [];
+    shapes.push(triangle);
+    shapes.push(parallelogram);
+
+
+    var Hamurabi = {
+
+        _init: () => {
+            this.displayCtx = document.getElementById('gameboard').getContext('2d');
+            this.displayCtx.font = "16px sans-serif";
+            this.people = 0;
+            this.bushels = 0;
+            this.acresLand = 10;
+            this.yearOfRule = 1;
+            Hamurabi._hud();
+        },
+
+        _hud: () => {
+            this.displayCtx.beginPath();
+            this.displayCtx.arc(70, 80, 10, 0, 2 * Math.PI, false);
+            this.displayCtx.fill();
+            helper.drawShape(triangle, this.displayCtx);
+            helper.drawShape(parallelogram, this.displayCtx);
+            Hamurabi.report();
+        },
+
+        report: () => {
+            this.displayCtx.fillText('Great Hamurabi, its the' + helper.getSuffix(this.yearOfRule) + ' year of your rule', 0, 16);
+            this.displayCtx.fillText('You own: ' + this.acresLand + ' Acres Land', 0, 32);
+            this.displayCtx.fillText('You own: ' + this.bushels + ' bushels corn', 0, 48);
+            this.displayCtx.fillText(this.people + ' people live in the city', 0, 64);
+        }
+
+
+    };
+
+    // Hamurabi._init = () => {
+    //
+    //     this.displayCtx = document.getElementById('gameboard').getContext('2d');
+    //     this.displayCtx.font = "16px sans-serif";
+    //     this.people = 0;
+    //     this.bushels = 0;
+    //     this.acresLand = 10;
+    //     this.yearOfRule = 1;
+    //
+    // };
+
+
+    // Hamurabi._hud = () => {
+    //     this.displayCtx.beginPath();
+    //     this.displayCtx.arc(70, 80, 10, 0, 2 * Math.PI, false);
+    //     this.displayCtx.fill();
+    //     this.displayCtx.addHitRegion({id: 'circle'});
+    // };
+
+    // Hamurabi.report = () => {
+    //
+    //     this.displayCtx.fillText('Great Hamurabi, its the' + helper.getSuffix(this.yearOfRule) + ' year of your rule', 0, 16);
+    //     this.displayCtx.fillText('You own: ' + this.acresLand + ' Acres Land', 0, 32);
+    //     this.displayCtx.fillText('You own: ' + this.bushels + ' bushels corn', 0, 48);
+    //     this.displayCtx.fillText(this.people + ' people live in the city', 0, 64);
+    //     console.log('You own: ', this.acresLand, ' Acres Land');
+    //
+    // };
+    //
+
+    // Hamurabi.foo();
+    Hamurabi._init();
+    // Hamurabi.report();
+
+</script>
+
+</body>
+</html>
+
+
+<!-- Credits & References:
+https://www.atariarchives.org/basicgames/showpage.php?page=78
+https://web.archive.org/web/20150120012304/http://www.dunnington.u-net.com/public/basicgames/HMRABI
+https://stackoverflow.com/questions/22317805/how-to-make-canvas-element-in-html-clickable
+//-->
