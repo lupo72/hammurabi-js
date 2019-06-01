@@ -15,35 +15,35 @@
     </legend>
 
 
-        <label for="buyland">
-            Acres Land <input type="text" name="buyland" id="buyland" disabled="disabled" tabindex="10">
-            <input type="button" value="buy" id="buylandbtn" disabled="disabled" tabindex="20">
-        </label>
+    <label for="buyland">
+        Acres Land <input type="text" name="buyland" id="buyland" disabled="disabled" tabindex="10">
+        <input type="button" value="buy" id="buylandbtn" disabled="disabled" tabindex="20">
+    </label>
 
-        <br>
-
-
-        <label for="sellland">
-            Acres Land <input type="text" name="sellland" id="sellland" disabled="disabled" tabindex="30">
-            <input type="button" value="sell" id="selllandbtn" disabled="disabled" tabindex="40">
-
-        </label>
-
-        <br>
+    <br>
 
 
-        <label for="feedpeople">
-            Bushels Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
-            <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
-        </label>
+    <label for="sellland">
+        Acres Land <input type="text" name="sellland" id="sellland" disabled="disabled" tabindex="30">
+        <input type="button" value="sell" id="selllandbtn" disabled="disabled" tabindex="40">
 
-        <br>
+    </label>
+
+    <br>
 
 
-        <label for="plantfood">
-            Bushels Grain <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
-            <input type="button" value="plant" id="plantfoodbtn" disabled="disabled" tabindex="80">
-        </label>
+    <label for="feedpeople">
+        Bushels Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
+        <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
+    </label>
+
+    <br>
+
+
+    <label for="plantfood">
+        Bushels Grain <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
+        <input type="button" value="plant" id="plantfoodbtn" disabled="disabled" tabindex="80">
+    </label>
 
 </fieldset>
 
@@ -86,7 +86,7 @@
 
             this.landCosts = Hamurabi._currentCostAcreLand();
 
-            Hamurabi._hud();
+            Hamurabi.start();
         },
 
 
@@ -108,19 +108,14 @@
         },
 
 
-        _hud: () => {
-
-            // this.displayCtx.beginPath();
-            // this.displayCtx.arc(70, 80, 10, 0, 2 * Math.PI, false);
-            // this.displayCtx.fill();
-
-            // helper.drawShape(triangle, this.displayCtx);
-            // helper.drawShape(parallelogram, this.displayCtx);
-
+        start: () => {
+            Hamurabi.startYear();
             Hamurabi._report();
         },
 
         _report: () => {
+
+            this.displayCtx.clearRect(0, 0, 500, 200);
 
             var y = 16;
             this.displayCtx.fillText('HAMURABI:  i beg to report you, in the ' + helper.getSuffix(this.yearOfRule) + ' year of your rule', 0, y);
@@ -129,9 +124,9 @@
             y += 16;
             this.displayCtx.fillText('You own: ' + this.acresLand + ' Acres Land', 0, y);
             y += 16;
-            this.displayCtx.fillText('You own: ' + this.grainInSilo + ' grainInSilo corn', 0, y);
+            this.displayCtx.fillText('One Acre of Land costs ' + this.landCosts + ' Sheffels grain', 0, y);
             y += 16;
-            this.displayCtx.fillText('One Acre of Land costs ' + this.landCosts + ' grainInSilo corn', 0, y);
+            this.displayCtx.fillText('You own: ' + this.grainInSilo + ' Sheffels corn', 0, y);
             y += 16;
             this.displayCtx.fillText(Hamurabi._totalPopulation() + ' people live in the city', 0, y);
             y += 16;
@@ -140,61 +135,98 @@
 
             this.population += this.immigrants;
             this.immigrants = 0;
-            Hamurabi.startYear();
         },
 
 
         startYear: () => {
-
             helper.buyLand.removeAttribute('disabled');
             helper.buyLandBtn.removeAttribute('disabled');
             helper.buyLand.focus();
+        },
+
+        incorrectInput: () => {
+            alert('Hammurabi you can only enter numbers');
+        },
+
+        handleBuyLandInput: () => {
+            var input = parseInt(helper.buyLand.value);
+            if (isNaN(input)) {
+                Hamurabi.incorrectInput();
+                helper.buyLand.value = "";
+                helper.buyLand.focus();
+            } else {
+                if (input * this.landCosts < this.grainInSilo) {
+                    var price = input * this.landCosts;
+                    this.grainInSilo -= price;
+                    this.acresLand += input;
+
+                    helper.buyLand.setAttribute('disabled', 'disabled');
+                    helper.buyLandBtn.setAttribute('disabled', 'disabled');
+
+                    helper.sellLand.removeAttribute('disabled');
+                    helper.sellLandBtn.removeAttribute('disabled');
+                    helper.sellLand.focus();
+                    Hamurabi._report();
+
+                } else {
+                    alert('Think again Hamurabi, you only have ' + this.grainInSilo + ' Sheffels corn - you try to spend ' + (input * this.landCosts) + " cost " + this.landCosts);
+                    helper.buyLand.focus();
+                }
+
+            }
 
         },
 
-        handleBuyLandInput() {
-            var b = helper.buyLand.value;
-            alert(parseInt(b));
-            this.buyAcres = b;
-            helper.buyLand.setAttribute('disabled', 'disabled');
-            helper.buyLandBtn.setAttribute('disabled', 'disabled')
+        handleSellLandInput: () =>  {
+            var input = helper.sellLand.value;
 
-            helper.sellLand.removeAttribute('disabled');
-            helper.sellLandBtn.removeAttribute('disabled');
-            helper.sellLand.focus();
+            if (isNaN(input)) {
+                Hamurabi.incorrectInput();
+                helper.sellLand.value = "";
+                helper.sellLand.focus();
+            }
+            else
+            {
+                if ( input < this.acresLand )
+                {
+                    this.grainInSilo += input * this.landCosts;
+                    this.acresLand -= input;
+
+                    helper.sellLand.setAttribute('disabled', 'disabled');
+                    helper.sellLandBtn.setAttribute('disabled', 'disabled');
+
+                    helper.feedPeople.removeAttribute('disabled');
+                    helper.feedPeopleBtn.removeAttribute('disabled');
+                    helper.feedPeople.focus();
+                    Hamurabi._report();
+                }
+                else
+                {
+                    alert('Think again Hamurabi, you only own ' + this.acresLand + ' Acres of land');
+                    helper.sellLand.focus();
+                }
+            }
 
         },
 
-        handleSellLandInput() {
-            var s = helper.sellLand.value;
-            alert(parseInt(s));
-            this.sellAcres = s;
-            helper.sellLand.setAttribute('disabled', 'disabled');
-            helper.sellLandBtn.setAttribute('disabled', 'disabled')
-
-            helper.feedPeople.removeAttribute('disabled');
-            helper.feedPeopleBtn.removeAttribute('disabled');
-            helper.feedPeople.focus();
-        },
-
-        handleFeedPeopleInput() {
+        handleFeedPeopleInput: () =>  {
             var f = helper.feedPeople.value;
             alert(parseInt(f));
             this.feedPeople = f;
             helper.feedPeople.setAttribute('disabled', 'disabled');
-            helper.feedPeopleBtn.setAttribute('disabled', 'disabled')
+            helper.feedPeopleBtn.setAttribute('disabled', 'disabled');
 
             helper.plantFood.removeAttribute('disabled');
             helper.plantFoodBtn.removeAttribute('disabled');
             helper.plantFood.focus();
         },
 
-        handlePlantFoodInput() {
+        handlePlantFoodInput: () =>  {
             var p = helper.plantFood.value;
             alert(parseInt(p));
             this.plantFood = p;
             helper.plantFood.setAttribute('disabled', 'disabled');
-            helper.plantFoodBtn.setAttribute('disabled', 'disabled')
+            helper.plantFoodBtn.setAttribute('disabled', 'disabled');
 
             // helper.plantFood.removeAttribute('disabled');
             // helper.plantFoodBtn.removeAttribute('disabled');
