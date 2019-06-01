@@ -5,49 +5,50 @@
     <title>Hammurabi Javascript Port</title>
 </head>
 <body>
-<canvas id="gameboard" width="500" height="200">
+<canvas id="gameboard" width="500" height="200"></canvas>
+
+<fieldset style="width:500px">
+    <legend>
+
+        I await your wise orders, oh hammurabi
+
+    </legend>
 
 
-</canvas>
+        <label for="buyland">
+            Acres Land <input type="text" name="buyland" id="buyland" disabled="disabled" tabindex="10">
+            <input type="button" value="buy" id="buylandbtn" disabled="disabled" tabindex="20">
+        </label>
 
-<form id="commands">
-
-
-    <label for="buyland">
-        Acres Land <input type="text" name="buyland" id="buyland" disabled="disabled" tabindex="10">
-        <input type="button" value="buy" id="buylandbtn" disabled="disabled" tabindex="20">
-    </label>
-
-    <br>
+        <br>
 
 
-    <label for="sellland">
-        Acres Land <input type="text" name="sellland" id="sellland" disabled="disabled" tabindex="30">
-        <input type="button" value="sell" id="selllandbtn" disabled="disabled" tabindex="40">
+        <label for="sellland">
+            Acres Land <input type="text" name="sellland" id="sellland" disabled="disabled" tabindex="30">
+            <input type="button" value="sell" id="selllandbtn" disabled="disabled" tabindex="40">
 
-    </label>
+        </label>
 
-    <br>
-
-
-    <label for="feedpeople">
-        Bushels Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
-        <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
-    </label>
-
-    <br>
+        <br>
 
 
-    <label for="plantfood">
-        Bushels Grain <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
-        <input type="button" value="plant" id="plantfoodbtn" disabled="disabled" tabindex="80">
-    </label>
+        <label for="feedpeople">
+            Bushels Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
+            <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
+        </label>
+
+        <br>
 
 
-</form>
+        <label for="plantfood">
+            Bushels Grain <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
+            <input type="button" value="plant" id="plantfoodbtn" disabled="disabled" tabindex="80">
+        </label>
+
+</fieldset>
+
 
 <script type="text/javascript">
-
 
     var helper = {};
 
@@ -68,73 +69,6 @@
 
     helper.plantFood = document.getElementById('plantfood');
     helper.plantFoodBtn = document.getElementById('plantfoodbtn');
-
-
-    helper.defineShape = (shape, ctx) => {
-        var points = shape.points;
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        for (var i = 1; i < points.length; i++) {
-            ctx.lineTo(points[i].x, points[i].y);
-        }
-    };
-
-    helper.drawShape = (shape, ctx) => {
-        helper.defineShape(shape, ctx);
-        ctx.fill();
-        ctx.stroke();
-    };
-
-
-    function handleMouseDown(e) {
-        e.preventDefault();
-
-        var $canvas = document.getElementById('gameboard');
-        var ctx = $canvas.getContext('2d');
-
-        var offsetX = $canvas.offsetLeft;
-        var offsetY = $canvas.offsetTop;
-
-        // get the mouse position
-        var mouseX = parseInt(e.clientX - offsetX);
-        var mouseY = parseInt(e.clientY - offsetY);
-
-        // console.log(offsetX, offsetY, mouseX, mouseY);
-
-        // iterate each shape in the shapes array
-        for (var i = 0; i < shapes.length; i++) {
-            var shape = shapes[i];
-            // define the current shape
-            helper.defineShape(shape, ctx);
-            // test if the mouse is in the current shape
-            if (ctx.isPointInPath(mouseX, mouseY)) {
-                // if inside, display the shape's message
-                alert(shape.message);
-            }
-        }
-
-    }
-
-
-    var gameboard = document.getElementById('gameboard').onmousedown = function (e) {
-        handleMouseDown(e);
-    };
-
-    var triangle = {
-        points: [{x: 25, y: 100}, {x: 50, y: 50}, {x: 75, y: 100}],
-        message: "I am a triangle"
-    };
-
-    var parallelogram = {
-        points: [{x: 150, y: 50}, {x: 250, y: 50}, {x: 200, y: 100}, {x: 100, y: 100}],
-        message: "I am a parallelogram"
-    };
-
-    // save the triangle and parallelogram in a shapes[] array
-
-    var shapes = [];
-    shapes.push(triangle);
-    shapes.push(parallelogram);
 
 
     var Hamurabi;
@@ -284,19 +218,19 @@
 
     Hamurabi._init();
 
-    document.getElementById('buylandbtn').addEventListener('click', (evt) => {
+    helper.buyLandBtn.addEventListener('click', (evt) => {
         Hamurabi.handleBuyLandInput();
     });
 
-    document.getElementById('selllandbtn').addEventListener('click', (evt) => {
+    helper.sellLandBtn.addEventListener('click', (evt) => {
         Hamurabi.handleSellLandInput();
     });
 
-    document.getElementById('feedpeoplebtn').addEventListener('click', (evt) => {
+    helper.feedPeopleBtn.addEventListener('click', (evt) => {
         Hamurabi.handleFeedPeopleInput();
     });
 
-    document.getElementById('plantfoodbtn').addEventListener('click', (evt) => {
+    helper.plantFoodBtn.addEventListener('click', (evt) => {
         Hamurabi.handlePlantFoodInput();
     });
 
