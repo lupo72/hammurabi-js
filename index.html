@@ -5,20 +5,69 @@
     <title>Hammurabi Javascript Port</title>
 </head>
 <body>
-<canvas id="gameboard" width="500" height="500">
+<canvas id="gameboard" width="500" height="200">
 
 
 </canvas>
 
+<form id="commands">
+
+
+    <label for="buyland">
+        Acres Land <input type="text" name="buyland" id="buyland" disabled="disabled" tabindex="10">
+        <input type="button" value="buy" id="buylandbtn" disabled="disabled" tabindex="20">
+    </label>
+
+    <br>
+
+
+    <label for="sellland">
+        Acres Land <input type="text" name="sellland" id="sellland" disabled="disabled" tabindex="30">
+        <input type="button" value="sell" id="selllandbtn" disabled="disabled" tabindex="40">
+
+    </label>
+
+    <br>
+
+
+    <label for="feedpeople">
+        Bushels Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
+        <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
+    </label>
+
+    <br>
+
+
+    <label for="plantfood">
+        Bushels Grain <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
+        <input type="button" value="plant" id="plantfoodbtn" disabled="disabled" tabindex="80">
+    </label>
+
+
+</form>
+
 <script type="text/javascript">
+
 
     var helper = {};
 
     helper.getSuffix = (number) => {
-
         if (number === 1) return "1st";
         else return number + "nd";
     };
+
+
+    helper.buyLand = document.getElementById('buyland');
+    helper.buyLandBtn = document.getElementById('buylandbtn');
+
+    helper.sellLand = document.getElementById('sellland');
+    helper.sellLandBtn = document.getElementById('selllandbtn');
+
+    helper.feedPeople = document.getElementById('feedpeople');
+    helper.feedPeopleBtn = document.getElementById('feedpeoplebtn');
+
+    helper.plantFood = document.getElementById('plantfood');
+    helper.plantFoodBtn = document.getElementById('plantfoodbtn');
 
 
     helper.defineShape = (shape, ctx) => {
@@ -41,7 +90,7 @@
         e.preventDefault();
 
         var $canvas = document.getElementById('gameboard');
-        var ctx =  $canvas.getContext('2d');
+        var ctx = $canvas.getContext('2d');
 
         var offsetX = $canvas.offsetLeft;
         var offsetY = $canvas.offsetTop;
@@ -88,70 +137,169 @@
     shapes.push(parallelogram);
 
 
-    var Hamurabi = {
+    var Hamurabi;
+    Hamurabi = {
 
         _init: () => {
             this.displayCtx = document.getElementById('gameboard').getContext('2d');
             this.displayCtx.font = "16px sans-serif";
-            this.people = 0;
-            this.bushels = 0;
-            this.acresLand = 10;
+            this.population = 95;
+            this.immigrants = 5;
+            this.deceased = 0;
+            this.grainInSilo = 3000;
+            this.acresLand = 1000;
             this.yearOfRule = 1;
+
+            this.landCosts = Hamurabi._currentCostAcreLand();
+
             Hamurabi._hud();
         },
 
-        _hud: () => {
-            this.displayCtx.beginPath();
-            this.displayCtx.arc(70, 80, 10, 0, 2 * Math.PI, false);
-            this.displayCtx.fill();
-            helper.drawShape(triangle, this.displayCtx);
-            helper.drawShape(parallelogram, this.displayCtx);
-            Hamurabi.report();
+
+        _rollDice: () => {
+
+            return Math.floor(Math.random() * 7);
+
         },
 
-        report: () => {
-            this.displayCtx.fillText('Great Hamurabi, its the' + helper.getSuffix(this.yearOfRule) + ' year of your rule', 0, 16);
-            this.displayCtx.fillText('You own: ' + this.acresLand + ' Acres Land', 0, 32);
-            this.displayCtx.fillText('You own: ' + this.bushels + ' bushels corn', 0, 48);
-            this.displayCtx.fillText(this.people + ' people live in the city', 0, 64);
-        }
+
+        _totalPopulation: () => {
+            return this.population += this.immigrants;
+        },
+
+        _currentCostAcreLand: () => {
+
+            return Math.floor(Math.random() * 11) + 16;
+
+        },
+
+
+        _hud: () => {
+
+            // this.displayCtx.beginPath();
+            // this.displayCtx.arc(70, 80, 10, 0, 2 * Math.PI, false);
+            // this.displayCtx.fill();
+
+            // helper.drawShape(triangle, this.displayCtx);
+            // helper.drawShape(parallelogram, this.displayCtx);
+
+            Hamurabi._report();
+        },
+
+        _report: () => {
+
+            var y = 16;
+            this.displayCtx.fillText('HAMURABI:  i beg to report you, in the ' + helper.getSuffix(this.yearOfRule) + ' year of your rule', 0, y);
+            y += 16;
+            this.displayCtx.fillText(this.deceased + ' people died. ' + this.immigrants + ' came to the city', 0, y);
+            y += 16;
+            this.displayCtx.fillText('You own: ' + this.acresLand + ' Acres Land', 0, y);
+            y += 16;
+            this.displayCtx.fillText('You own: ' + this.grainInSilo + ' grainInSilo corn', 0, y);
+            y += 16;
+            this.displayCtx.fillText('One Acre of Land costs ' + this.landCosts + ' grainInSilo corn', 0, y);
+            y += 16;
+            this.displayCtx.fillText(Hamurabi._totalPopulation() + ' people live in the city', 0, y);
+            y += 16;
+            y += 16;
+            this.displayCtx.fillText('What are your orders?', 0, y);
+
+            this.population += this.immigrants;
+            this.immigrants = 0;
+            Hamurabi.startYear();
+        },
+
+
+        startYear: () => {
+
+            helper.buyLand.removeAttribute('disabled');
+            helper.buyLandBtn.removeAttribute('disabled');
+            helper.buyLand.focus();
+
+        },
+
+        handleBuyLandInput() {
+            var b = helper.buyLand.value;
+            alert(parseInt(b));
+            this.buyAcres = b;
+            helper.buyLand.setAttribute('disabled', 'disabled');
+            helper.buyLandBtn.setAttribute('disabled', 'disabled')
+
+            helper.sellLand.removeAttribute('disabled');
+            helper.sellLandBtn.removeAttribute('disabled');
+            helper.sellLand.focus();
+
+        },
+
+        handleSellLandInput() {
+            var s = helper.sellLand.value;
+            alert(parseInt(s));
+            this.sellAcres = s;
+            helper.sellLand.setAttribute('disabled', 'disabled');
+            helper.sellLandBtn.setAttribute('disabled', 'disabled')
+
+            helper.feedPeople.removeAttribute('disabled');
+            helper.feedPeopleBtn.removeAttribute('disabled');
+            helper.feedPeople.focus();
+        },
+
+        handleFeedPeopleInput() {
+            var f = helper.feedPeople.value;
+            alert(parseInt(f));
+            this.feedPeople = f;
+            helper.feedPeople.setAttribute('disabled', 'disabled');
+            helper.feedPeopleBtn.setAttribute('disabled', 'disabled')
+
+            helper.plantFood.removeAttribute('disabled');
+            helper.plantFoodBtn.removeAttribute('disabled');
+            helper.plantFood.focus();
+        },
+
+        handlePlantFoodInput() {
+            var p = helper.plantFood.value;
+            alert(parseInt(p));
+            this.plantFood = p;
+            helper.plantFood.setAttribute('disabled', 'disabled');
+            helper.plantFoodBtn.setAttribute('disabled', 'disabled')
+
+            // helper.plantFood.removeAttribute('disabled');
+            // helper.plantFoodBtn.removeAttribute('disabled');
+            // helper.plantFood.focus();
+
+            Hamurabi.gameturn();
+
+        },
+
+
+        gameturn: () => {
+
+            var plaqueStrikes;
+            plaqueStrikes = parseInt(10 * (2 * Math.random() - .3));
+            console.log(plaqueStrikes);
+
+        },
 
 
     };
 
-    // Hamurabi._init = () => {
-    //
-    //     this.displayCtx = document.getElementById('gameboard').getContext('2d');
-    //     this.displayCtx.font = "16px sans-serif";
-    //     this.people = 0;
-    //     this.bushels = 0;
-    //     this.acresLand = 10;
-    //     this.yearOfRule = 1;
-    //
-    // };
-
-
-    // Hamurabi._hud = () => {
-    //     this.displayCtx.beginPath();
-    //     this.displayCtx.arc(70, 80, 10, 0, 2 * Math.PI, false);
-    //     this.displayCtx.fill();
-    //     this.displayCtx.addHitRegion({id: 'circle'});
-    // };
-
-    // Hamurabi.report = () => {
-    //
-    //     this.displayCtx.fillText('Great Hamurabi, its the' + helper.getSuffix(this.yearOfRule) + ' year of your rule', 0, 16);
-    //     this.displayCtx.fillText('You own: ' + this.acresLand + ' Acres Land', 0, 32);
-    //     this.displayCtx.fillText('You own: ' + this.bushels + ' bushels corn', 0, 48);
-    //     this.displayCtx.fillText(this.people + ' people live in the city', 0, 64);
-    //     console.log('You own: ', this.acresLand, ' Acres Land');
-    //
-    // };
-    //
-
-    // Hamurabi.foo();
     Hamurabi._init();
-    // Hamurabi.report();
+
+    document.getElementById('buylandbtn').addEventListener('click', (evt) => {
+        Hamurabi.handleBuyLandInput();
+    });
+
+    document.getElementById('selllandbtn').addEventListener('click', (evt) => {
+        Hamurabi.handleSellLandInput();
+    });
+
+    document.getElementById('feedpeoplebtn').addEventListener('click', (evt) => {
+        Hamurabi.handleFeedPeopleInput();
+    });
+
+    document.getElementById('plantfoodbtn').addEventListener('click', (evt) => {
+        Hamurabi.handlePlantFoodInput();
+    });
+
 
 </script>
 
