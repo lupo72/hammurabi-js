@@ -33,7 +33,7 @@
 
 
     <label for="feedpeople">
-        Bushels Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
+        Shffl Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
         <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
     </label>
 
@@ -41,8 +41,8 @@
 
 
     <label for="plantfood">
-        Bushels Grain <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
-        <input type="button" value="plant" id="plantfoodbtn" disabled="disabled" tabindex="80">
+        Acres Land <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
+        <input type="button" value="plant food" id="plantfoodbtn" disabled="disabled" tabindex="80">
     </label>
 
 </fieldset>
@@ -210,15 +210,35 @@
         },
 
         handleFeedPeopleInput: () =>  {
-            var f = helper.feedPeople.value;
-            alert(parseInt(f));
-            this.feedPeople = f;
-            helper.feedPeople.setAttribute('disabled', 'disabled');
-            helper.feedPeopleBtn.setAttribute('disabled', 'disabled');
+            var input = helper.feedPeople.value;
+            if (isNaN(input)) {
+                Hamurabi.incorrectInput();
+                helper.feedPeople.value = "";
+                helper.feedPeople.focus();
+            }
+            else
+            {
+                if ( input < this.grainInSilo )
+                {
+                    this.grainInSilo -= input;
+                    this.fullTummies = parseInt(input / 20);
+                    console.log(this.fullTummies);
 
-            helper.plantFood.removeAttribute('disabled');
-            helper.plantFoodBtn.removeAttribute('disabled');
-            helper.plantFood.focus();
+                    helper.feedPeople.setAttribute('disabled', 'disabled');
+                    helper.feedPeopleBtn.setAttribute('disabled', 'disabled');
+
+                    helper.plantFood.removeAttribute('disabled');
+                    helper.plantFoodBtn.removeAttribute('disabled');
+                    helper.plantFood.focus();
+                    Hamurabi._report();
+                }
+                else
+                {
+                    alert('Think again Hamurabi, you only own ' + this.grainInSilo + ' Sheffels corn');
+                    helper.feedPeople.focus();
+                }
+            }
+
         },
 
         handlePlantFoodInput: () =>  {
@@ -242,7 +262,8 @@
             var plaqueStrikes;
             plaqueStrikes = parseInt(10 * (2 * Math.random() - .3));
             console.log(plaqueStrikes);
-
+            this.yearOfRule += 1;
+            Hamurabi.startYear();
         },
 
 
