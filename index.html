@@ -15,35 +15,45 @@
     </legend>
 
 
-    <label for="buyland">
-        Acres Land <input type="text" name="buyland" id="buyland" disabled="disabled" tabindex="10">
-        <input type="button" value="buy" id="buylandbtn" disabled="disabled" tabindex="20">
-    </label>
+    <form id="buylandfrm">
 
-    <br>
+        <label for="buyland">
+            Acres Land <input type="text" name="buyland" id="buyland" disabled="disabled" tabindex="10">
+            <input type="button" value="buy" id="buylandbtn" disabled="disabled" tabindex="20">
+        </label>
 
-
-    <label for="sellland">
-        Acres Land <input type="text" name="sellland" id="sellland" disabled="disabled" tabindex="30">
-        <input type="button" value="sell" id="selllandbtn" disabled="disabled" tabindex="40">
-
-    </label>
-
-    <br>
+    </form>
 
 
-    <label for="feedpeople">
-        Shffl Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
-        <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
-    </label>
+    <form id="selllandfrm">
 
-    <br>
+        <label for="sellland">
+            Acres Land <input type="text" name="sellland" id="sellland" disabled="disabled" tabindex="30">
+            <input type="button" value="sell" id="selllandbtn" disabled="disabled" tabindex="40">
+
+        </label>
+
+    </form>
+
+    <form id="feedpeoplefrm">
 
 
-    <label for="plantfood">
-        Acres Land <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
-        <input type="button" value="plant food" id="plantfoodbtn" disabled="disabled" tabindex="80">
-    </label>
+        <label for="feedpeople">
+            Shffl Grain <input type="text" name="feedpeople" id="feedpeople" disabled="disabled" tabindex="50">
+            <input type="button" value="feed to the people" id="feedpeoplebtn" disabled="disabled" tabindex="60">
+        </label>
+
+    </form>
+
+    <form id="plantfoodfrm">
+
+        <label for="plantfood">
+            Acres Land <input type="text" name="plantfood" id="plantfood" disabled="disabled" tabindex="70">
+            <input type="button" value="plant food" id="plantfoodbtn" disabled="disabled" tabindex="80">
+        </label>
+
+    </form>
+
 
 </fieldset>
 
@@ -60,15 +70,19 @@
 
     helper.buyLand = document.getElementById('buyland');
     helper.buyLandBtn = document.getElementById('buylandbtn');
+    helper.buyLandForm = document.getElementById('buylandfrm');
 
     helper.sellLand = document.getElementById('sellland');
     helper.sellLandBtn = document.getElementById('selllandbtn');
+    helper.sellLandForm = document.getElementById('selllandfrm');
 
     helper.feedPeople = document.getElementById('feedpeople');
     helper.feedPeopleBtn = document.getElementById('feedpeoplebtn');
+    helper.feedPeopleForm = document.getElementById('feedpeoplefrm');
 
     helper.plantFood = document.getElementById('plantfood');
     helper.plantFoodBtn = document.getElementById('plantfoodbtn');
+    helper.plantFoodForm = document.getElementById('plantfoodfrm');
 
 
     var Hamurabi;
@@ -133,8 +147,9 @@
             y += 16;
             this.displayCtx.fillText('What are your orders?', 0, y);
 
-            this.population += this.immigrants;
+            this.population = this.population + this.immigrants - this.deceased;
             this.immigrants = 0;
+            this.deceased = 0;
         },
 
 
@@ -177,18 +192,15 @@
 
         },
 
-        handleSellLandInput: () =>  {
+        handleSellLandInput: () => {
             var input = helper.sellLand.value;
 
             if (isNaN(input)) {
                 Hamurabi.incorrectInput();
                 helper.sellLand.value = "";
                 helper.sellLand.focus();
-            }
-            else
-            {
-                if ( input < this.acresLand )
-                {
+            } else {
+                if (input < this.acresLand) {
                     this.grainInSilo += input * this.landCosts;
                     this.acresLand -= input;
 
@@ -199,9 +211,7 @@
                     helper.feedPeopleBtn.removeAttribute('disabled');
                     helper.feedPeople.focus();
                     Hamurabi._report();
-                }
-                else
-                {
+                } else {
                     alert('Think again Hamurabi, you only own ' + this.acresLand + ' Acres of land');
                     helper.sellLand.focus();
                 }
@@ -209,20 +219,18 @@
 
         },
 
-        handleFeedPeopleInput: () =>  {
+        handleFeedPeopleInput: () => {
             var input = helper.feedPeople.value;
             if (isNaN(input)) {
                 Hamurabi.incorrectInput();
                 helper.feedPeople.value = "";
                 helper.feedPeople.focus();
-            }
-            else
-            {
-                if ( input < this.grainInSilo )
-                {
+            } else {
+                if (input < this.grainInSilo) {
                     this.grainInSilo -= input;
                     this.fullTummies = parseInt(input / 20);
-                    console.log(this.fullTummies);
+
+                    // console.log(this.fullTummies);
 
                     helper.feedPeople.setAttribute('disabled', 'disabled');
                     helper.feedPeopleBtn.setAttribute('disabled', 'disabled');
@@ -230,10 +238,9 @@
                     helper.plantFood.removeAttribute('disabled');
                     helper.plantFoodBtn.removeAttribute('disabled');
                     helper.plantFood.focus();
-                    Hamurabi._report();
-                }
-                else
-                {
+
+                    // Hamurabi._report();
+                } else {
                     alert('Think again Hamurabi, you only own ' + this.grainInSilo + ' Sheffels corn');
                     helper.feedPeople.focus();
                 }
@@ -241,18 +248,34 @@
 
         },
 
-        handlePlantFoodInput: () =>  {
-            var p = helper.plantFood.value;
-            alert(parseInt(p));
-            this.plantFood = p;
-            helper.plantFood.setAttribute('disabled', 'disabled');
-            helper.plantFoodBtn.setAttribute('disabled', 'disabled');
+        handlePlantFoodInput: () => {
+            var input = helper.plantFood.value;
+            if (isNaN(input)) {
+                Hamurabi.incorrectInput();
+                helper.plantFood.value = "";
+                helper.plantFood.focus();
+            } else {
+                if (input / 2 < this.grainInSilo && input < this.population * 10) {
 
-            // helper.plantFood.removeAttribute('disabled');
-            // helper.plantFoodBtn.removeAttribute('disabled');
-            // helper.plantFood.focus();
 
-            Hamurabi.gameturn();
+                    helper.plantFood.setAttribute('disabled', 'disabled');
+                    helper.plantFoodBtn.setAttribute('disabled', 'disabled');
+
+                    // Harvest
+                    this.grainInSilo += input * Hamurabi._rollDice();
+                    Hamurabi.gameturn();
+
+                } else {
+                    if (input / 2 >= this.grainInSilo) {
+                        alert('Think again Hamurabi, you only own ' + this.grainInSilo + ' Sheffels corn');
+                    } else if (input >= this.population * 10) {
+                        alert('Think again Hamurabi, only ' + this.population + ' people can work on the fields');
+                    }
+
+                    helper.plantFood.focus();
+                }
+
+            }
 
         },
 
@@ -261,8 +284,18 @@
 
             var plaqueStrikes;
             plaqueStrikes = parseInt(10 * (2 * Math.random() - .3));
-            console.log(plaqueStrikes);
+
+            if (plaqueStrikes < 0) {
+                alert('Plague - half people die!!!');
+                this.population = Math.floor(this.population / 2);
+            }
+
+            this.immigrants = Hamurabi._rollDice() * (20 * this.acresLand + this.grainInSilo) / this.population / 100 + 1;
+            this.deceased = this.population - this.fullTummies;
+
+
             this.yearOfRule += 1;
+            Hamurabi._report();
             Hamurabi.startYear();
         },
 
@@ -271,19 +304,23 @@
 
     Hamurabi._init();
 
-    helper.buyLandBtn.addEventListener('click', (evt) => {
+    helper.buyLandForm.addEventListener('submit', (evt) => {
+        evt.preventDefault();
         Hamurabi.handleBuyLandInput();
     });
 
-    helper.sellLandBtn.addEventListener('click', (evt) => {
+    helper.sellLandForm.addEventListener('submit', (evt) => {
+        evt.preventDefault();
         Hamurabi.handleSellLandInput();
     });
 
-    helper.feedPeopleBtn.addEventListener('click', (evt) => {
+    helper.feedPeopleForm.addEventListener('submit', (evt) => {
+        evt.preventDefault();
         Hamurabi.handleFeedPeopleInput();
     });
 
-    helper.plantFoodBtn.addEventListener('click', (evt) => {
+    helper.plantFoodForm.addEventListener('submit', (evt) => {
+        evt.preventDefault();
         Hamurabi.handlePlantFoodInput();
     });
 
