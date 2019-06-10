@@ -114,16 +114,7 @@
 
             }
 
-            this.population = 95;
-            this.immigrants = 5;
-            this.deceased = 0;
-            this.grainInSilo = 3000;
-            this.acresLand = 1000;
-            this.yearOfRule = 1;
-
             this.landCosts = Hamurabi._currentCostAcreLand();
-
-
             Hamurabi._run();
         },
 
@@ -160,7 +151,7 @@
             var y = 16;
             // this.displayCtx.fillText('HAMURABI:  i beg to report you, in the ' + helper.getSuffix(this._gameVariables.year) + ' year of your rule', 0, y);
             y += 16;
-            this.displayCtx.fillText(this._gameVariables.deceased + ' people died. ' + this._gameVariables.newborns + ' came to the city', 0, y);
+            // this.displayCtx.fillText(this._gameVariables.deceased + ' people died. ' + this._gameVariables.newborns + ' came to the city', 0, y);
             y += 16;
             // this.displayCtx.fillText('You own: ' + this._gameVariables.land + ' Acres Land', 0, y);
             y += 16;
@@ -200,12 +191,27 @@
             this.displayCtx.fillText('You own: ' + this._gameVariables.land + ' Acres Land', 0, y);
         },
 
-        _reportHarvest: (harvest) => {
+        _reportHarvest: (harvested) => {
             var y = 64;
             this.displayCtx.clearRect(0, y - 16, 500, y);
             this.displayCtx.fillText('you harvested ' + harvested + ' Sheffels Corn! ', 0, y);
 
         },
+
+        _reportFostered: (fostered) => {
+            var y = 80;
+            this.displayCtx.clearRect(0, y - 16, 500, y);
+            this.displayCtx.fillText(  fostered + ' people had full tummies!', 0, y);
+
+        },
+
+        _reportStarved: (starved) => {
+            var y = 96;
+            this.displayCtx.clearRect(0, y - 16, 500, y);
+            this.displayCtx.fillText(  starved + ' peopls starved!', 0, y);
+        },
+
+
 
         // _reportGrainInSilo: () => {},
         // _reportImmigrants: () => {},
@@ -260,7 +266,7 @@
                 helper.sellLand.value = "";
                 helper.sellLand.focus();
             } else {
-                if (input < this.acresLand) {
+                if (input < this._gameVariables.land) {
                     this._gameVariables.silo += input * this.landCosts;
                     this._gameVariables.land -= input;
 
@@ -299,9 +305,10 @@
                     helper.plantFoodBtn.removeAttribute('disabled');
                     helper.plantFood.focus();
 
-                    // Hamurabi._report();
+                    Hamurabi._reportFostered(enoughToEat);
+                    Hamurabi._reportStarved(this.starving);
                 } else {
-                    alert('Think again Hamurabi, you only own ' + this.grainInSilo + ' Sheffels corn');
+                    alert('Think again Hamurabi, you only own ' + this._gameVariables.silo + ' Sheffels corn');
                     helper.feedPeople.focus();
                 }
             }
@@ -350,14 +357,14 @@
 
             if (plaqueStrikes < 0) {
                 alert('Plague - half people die!!!');
-                this.population = Math.floor(this.population / 2);
+                this._gameVariables.population = Math.floor(this._gameVariables.population / 2);
             }
 
-            this.immigrants = Hamurabi._rollDice() * (20 * this.acresLand + this.grainInSilo) / this.population / 100 + 1;
-            this.deceased = this.population - this.fullTummies;
+            this._gameVariables.newborns = Hamurabi._rollDice() * (20 * this._gameVariables.land + this._gameVariables.silo) / this._gameVariables.population / 100 + 1;
+            this._gameVariables.year += 1;
 
+            window.localStorage.setItem('hamurabi-js', JSON.stringify(this._gameVariables));
 
-            this.yearOfRule += 1;
             Hamurabi._report();
             Hamurabi._startYear();
         },
