@@ -133,59 +133,66 @@
 
         _report: () => {
 
+            // should only be displayed at start of turn.
+
             this.yPos = 16;
             Hamurabi._reportYearOfRule();
+
+            this.yPos+= 16;
             Hamurabi._reportDeceasedAndImmigrants();
+
             this._gameVariables.population += this._gameVariables.newborns - this._gameVariables.deceased;
             this._gameVariables.newborns = 0;  this._gameVariables.deceased = 0;
-            Hamurabi._calculateNeededGrain();
+
+            this.yPos+= 16;
             Hamurabi._reportTotalPopulation();
+
+            this.yPos+= 16;
+            Hamurabi._calculateNeededGrain();
+
+            this.yPos+= 16;
+            Hamurabi._reportCostOfLand();
+
+            // Dynamic - changes during gameturn...
+
+            this.yPos+= 16;
             Hamurabi._reportAcresLand();
+
+            this.yPos+= 16;
             Hamurabi._reportGrainInSilo();
 
-            var y = 160;
-            this.displayCtx.clearRect(0, y - 16, 500, y);
-            this.displayCtx.fillText('One Acre of Land costs ' + this.landCosts + ' Sheffels grain', 0, y);
-            y += 16;
+            var y = 132;
             this.displayCtx.fillText('What are your orders?', 0, y);
         },
 
         _reportYearOfRule: () => {
             this.displayCtx.clearRect(0, this.yPos - 16, 500, this.yPos);
-            this.displayCtx.fillText('HAMURABI:  i beg to report you, in the ' + helper.getSuffix(this._gameVariables.year) + ' year of your rule', 0, y);
-            this.yPos+= 16;
+            this.displayCtx.fillText('HAMURABI:  i beg to report you, in the ' + helper.getSuffix(this._gameVariables.year) + ' year of your rule', 0, this.yPos);
+
         },
 
         _reportDeceasedAndImmigrants: () => {
-            var y = 32;
-            this.displayCtx.clearRect(0, y - 16, 500, y);
-            this.displayCtx.fillText(this._gameVariables.deceased + ' people died. ' + this._gameVariables.newborns + ' came to the city', 0, y);
+            this.displayCtx.clearRect(0, this.yPos - 16, 500, this.yPos);
+            this.displayCtx.fillText(this._gameVariables.deceased + ' people died. ' + this._gameVariables.newborns + ' came to the city', 0, this.yPos);
         },
 
         _calculateNeededGrain: () => {
-
-            var y = 48;
-            this.displayCtx.clearRect(0, y - 16, 500, y);
+            this.displayCtx.clearRect(0, this.yPos - 16, 500, this.yPos);
             var grainNeeded = this._gameVariables.population * 20;
-            this.displayCtx.fillText('You need ' + grainNeeded + ' Grain to feed your people', 0, y);
-
+            this.displayCtx.fillText('You need ' + grainNeeded + ' Grain to feed your people', 0, this.yPos);
         },
 
         _calculateMaxPlants: () => {
-
-
         },
 
         _reportAcresLand: () => {
-            var y = 64;
-            this.displayCtx.clearRect(0, y - 16, 500, y);
-            this.displayCtx.fillText('You own: ' + this._gameVariables.land + ' Acres Land', 0, y);
+            this.displayCtx.clearRect(0, this.yPos - 16, 500, this.yPos);
+            this.displayCtx.fillText('You own: ' + this._gameVariables.land + ' Acres Land', 0, this.yPos);
         },
 
         _reportGrainInSilo: () => {
-            var y = 80;
-            this.displayCtx.clearRect(0, y - 16, 500, y);
-            this.displayCtx.fillText('You own: ' + this._gameVariables.silo + ' Sheffels corn', 0, y);
+            this.displayCtx.clearRect(0, this.yPos - 16, 500, this.yPos);
+            this.displayCtx.fillText('You own: ' + this._gameVariables.silo + ' Sheffels corn', 0, this.yPos);
 
         },
 
@@ -209,16 +216,16 @@
             this.displayCtx.fillText(  starved + ' peopls starved!', 0, y);
         },
 
-
-
-
         _reportTotalPopulation: () => {
-            var y = 144;
-            this.displayCtx.clearRect(0, y - 16, 500, y);
-            this.displayCtx.fillText(this._gameVariables.population + ' people live in the city', 0, y);
+            this.displayCtx.clearRect(0, this.yPos - 16, 500, this.yPos);
+            this.displayCtx.fillText(this._gameVariables.population + ' people live in the city', 0, this.yPos);
 
         },
 
+        _reportCostOfLand: () => {
+            this.displayCtx.clearRect(0, this.yPos - 16, 500, this.yPos);
+            this.displayCtx.fillText('One Acre of Land costs ' + this.landCosts + ' Sheffels grain', 0, this.yPos);
+        },
 
         _startYear: () => {
             helper.buyLand.removeAttribute('disabled');
@@ -249,10 +256,10 @@
                     helper.sellLandBtn.removeAttribute('disabled');
                     helper.sellLand.focus();
 
-                    Hamurabi._report();
-
-                    // Hamurabi._reportAcresLand();
-                    // Hamurabi._reportGrainInSilo();
+                    // Hamurabi._report();
+                    this.yPos = 96;
+                    Hamurabi._reportAcresLand();
+                    Hamurabi._reportGrainInSilo();
 
                 } else {
                     alert('Think again Hamurabi, you only have ' + this._gameVariables.silo
@@ -283,9 +290,11 @@
                     helper.feedPeopleBtn.removeAttribute('disabled');
                     helper.feedPeople.focus();
 
-                    Hamurabi._report();
+                    // Hamurabi._report();
+                    this.yPos = 96;
+                    Hamurabi._reportAcresLand();
+                    Hamurabi._reportGrainInSilo();
 
-                    // Hamurabi._reportAcresLand();
                 } else {
                     alert('Think again Hamurabi, you only own ' + this._gameVariables.land + ' Acres of land');
                     helper.sellLand.focus();
@@ -376,6 +385,7 @@
 
             this._gameVariables.newborns = Math.ceil(Hamurabi._rollDice() * (20 * this._gameVariables.land + this._gameVariables.silo) / this._gameVariables.population / 100 + 1);
             this._gameVariables.year += 1;
+            this.landCosts = Hamurabi._currentCostAcreLand();
 
             window.localStorage.setItem('hamurabi-js', JSON.stringify(this._gameVariables));
 
